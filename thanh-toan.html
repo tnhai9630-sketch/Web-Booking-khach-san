@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh toán - 8P Travel</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .checkout { max-width: 500px; margin: auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+    .checkout-section { margin-bottom: 20px; }
+    label { display:block; margin-top:10px; }
+    input[type="text"], input[type="email"], input[type="tel"], select {
+      width:100%; padding:8px; margin-top:5px;
+      border-radius:5px; border:1px solid #ccc;
+    }
+    .btn { background:#28a745; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer; width:100%; margin-top:15px;}
+    #bank-qr img { margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<div class="checkout">
+  <h1>Thanh toán đặt phòng</h1>
+
+  <form id="paymentForm">
+    <section class="checkout-section">
+      <h2>Thông tin khách hàng</h2>
+      <label>Họ và tên</label>
+      <input type="text" name="fullname" required>
+
+      <label>Email</label>
+      <input type="email" name="email" required>
+
+      <label>Số điện thoại</label>
+      <input type="tel" name="phone" required>
+    </section>
+
+    <section class="checkout-section">
+      <h2>Thông tin đặt phòng</h2>
+      <p>Khách sạn: <strong id="hotel-name">--</strong></p>
+      <p>Ngày nhận phòng: <span id="checkin-date">--/--/----</span></p>
+      <p>Ngày trả phòng: <span id="checkout-date">--/--/----</span></p>
+      <p>Số khách: <span id="guest-count">--</span></p>
+      <p>Số đêm: <span id="night-count">0</span></p>
+      <p>Tổng tiền: <strong id="total-price">0đ</strong></p>
+    </section>
+
+    <section class="checkout-section">
+      <h2>Phương thức thanh toán</h2>
+      <label><input type="radio" name="payment" value="momo" required> Ví MoMo</label><br>
+      <label><input type="radio" name="payment" value="vnpay"> VNPay</label><br>
+      <label><input type="radio" name="payment" value="bank"> Thẻ ngân hàng (QR)</label>
+
+      <div id="bank-qr" style="display:none; margin-top:20px; text-align:center;">
+        <h3>Quét mã QR để thanh toán</h3>
+        <img id="qr-code" src="" width="250" alt="QR Thanh toán">
+        <p><small>Sử dụng ứng dụng ngân hàng để quét mã</small></p>
+      </div>
+    </section>
+
+    <button type="submit" class="btn">Xác nhận thanh toán</button>
+  </form>
+</div>
+
+<script>
+  // Lấy dữ liệu từ localStorage
+  const hotel    = localStorage.getItem("selectedHotel") || "Chưa chọn";
+  const checkin  = localStorage.getItem("checkin")  || "--/--/----";
+  const checkout = localStorage.getItem("checkout") || "--/--/----";
+  const guests   = localStorage.getItem("guests")   || "--";
+  const nights   = localStorage.getItem("nights")   || "0";
+  const total    = localStorage.getItem("total")    || "0";
+
+  // Gán ra giao diện
+  document.getElementById("hotel-name").textContent   = hotel;
+  document.getElementById("checkin-date").textContent = checkin;
+  document.getElementById("checkout-date").textContent= checkout;
+  document.getElementById("guest-count").textContent  = guests;
+  document.getElementById("night-count").textContent  = nights;
+  document.getElementById("total-price").textContent  = Number(total).toLocaleString("vi-VN") + "đ";
+
+  // Bank QR
+  const bankId = "970407"; 
+  const accountNo = "19050921741012";
+  const accountName = "TRAN THI NHAI";  
+  const addInfo = "Thanh toan dat phong KS";
+  const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${total}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(accountName)}`;
+
+  document.querySelectorAll('input[name="payment"]').forEach(r => {
+    r.addEventListener('change', () => {
+      if (r.value === 'bank' && r.checked) {
+        document.getElementById("bank-qr").style.display = "block";
+        document.getElementById("qr-code").src = qrUrl;
+      } else {
+        document.getElementById("bank-qr").style.display = "none";
+      }
+    });
+  });
+
+  // Sinh mã đặt chỗ ngẫu nhiên
+  function generateBookingCode(){
+    return "BOOK" + Math.floor(Math.random() * 1000000);
+  }
+
+  // Xử lý submit
+  document.getElementById("paymentForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const payment = document.querySelector('input[name="payment"]:checked').value;
+
+    // Tạo thông tin đặt phòng
+    const booking = {
+      code: generateBookingCode(),
+      hotel: localStorage.getItem("hotelName") || hotel || "Chưa rõ khách sạn",
+      checkin: checkin,
+      checkout: checkout,
+      guests: guests,
+      nights: nights,
+      total: total,
+      status: payment === "bank" ? "Chờ thanh toán" : "Đã thanh toán",
+      createdAt: new Date().toLocaleString("vi-VN")
+    };
+
+    // Lưu vào localStorage (mảng bookings)
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    bookings.push(booking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+
+    if(payment === "bank"){
+      alert("Vui lòng quét mã QR để hoàn tất thanh toán.");
+    } else {
+      alert("Thanh toán thành công!");
+      // Xóa dữ liệu tạm thời
+      localStorage.setItem("hotelName", selectedHotel);
+      localStorage.removeItem("selectedHotel");
+      localStorage.removeItem("checkin");
+      localStorage.removeItem("checkout");
+      localStorage.removeItem("guests");
+      localStorage.removeItem("nights");
+      localStorage.removeItem("total");
+    }
+
+    // Chuyển hướng sang danh sách đặt chỗ
+    window.location.href = "xac-nhan-thanh-toan.html";
+  });
+</script>
+
+</body>
+</html>

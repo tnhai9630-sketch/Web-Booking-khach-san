@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xác nhận đặt chỗ - 8P Travel</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .confirmation { max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+    h1 { color: #28a745; }
+    .details { margin-top: 20px; text-align: left; }
+    .details p { margin: 8px 0; }
+    .btn { display:inline-block; margin-top:20px; background:#007bff; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; }
+    .btn:hover { background:#0056b3; }
+  </style>
+</head>
+<body>
+
+<div class="confirmation">
+  <h1>🎉 Đặt phòng thành công!</h1>
+  <p>Cảm ơn bạn đã đặt phòng qua <strong>8P Travel</strong>. Chúng tôi đã ghi nhận thông tin của bạn.</p>
+
+  <div class="details">
+    <h2>Chi tiết đặt phòng</h2>
+    <p>Khách sạn: <strong id="hotel-name">--</strong></p>
+    <p>Ngày nhận phòng: <span id="checkin-date">--/--/----</span></p>
+    <p>Ngày trả phòng: <span id="checkout-date">--/--/----</span></p>
+    <p>Số khách: <span id="guest-count">--</span></p>
+    <p>Số đêm: <span id="night-count">0</span></p>
+    <p>Tổng tiền: <strong id="total-price">0đ</strong></p>
+  </div>
+
+  <a href="index.html" class="btn" id="home-btn">Về trang chủ</a>
+</div>
+
+<script>
+  // Lấy dữ liệu từ localStorage (trùng với key bạn dùng ở trang thanh-toan)
+  const hotel   = localStorage.getItem("hotelName")   || "--";
+  const checkin = localStorage.getItem("checkin")     || "--/--/----";
+  const checkout= localStorage.getItem("checkout")    || "--/--/----";
+  const guests  = localStorage.getItem("guests")      || "--";
+  const nights  = localStorage.getItem("nights")      || "0";
+  const total   = localStorage.getItem("total")       || "0";
+
+  // Hiển thị ra giao diện
+  document.getElementById("hotel-name").textContent   = hotel;
+  document.getElementById("checkin-date").textContent  = checkin;
+  document.getElementById("checkout-date").textContent = checkout;
+  document.getElementById("guest-count").textContent   = guests;
+  document.getElementById("night-count").textContent   = nights;
+  document.getElementById("total-price").textContent   = Number(total).toLocaleString("vi-VN") + "đ";
+
+  // Chỉ xoá dữ liệu khi người dùng bấm "Về trang chủ"
+  document.getElementById("home-btn").addEventListener("click", () => {
+    localStorage.removeItem("hotelName");
+    localStorage.removeItem("checkin");
+    localStorage.removeItem("checkout");
+    localStorage.removeItem("guests");
+    localStorage.removeItem("nights");
+    localStorage.removeItem("total");
+  });
+</script>
+
+</body>
+</html>

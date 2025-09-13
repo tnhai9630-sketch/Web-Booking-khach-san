@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danh sách đặt chỗ</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+#messageBox {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+}
+#messageBox.success { background-color: #10B981; }
+#messageBox.error { background-color: #EF4444; }
+#messageBox.visible { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body class="bg-slate-50">
+
+<header class="bg-white shadow-sm py-4">
+    <div class="container mx-auto flex justify-between items-center px-4">
+        <div class="flex items-center space-x-2">
+            <img src="assets/Layer_1.png" alt="8P Travel Logo" class="h-10 w-10">
+            <span class="text-2xl font-bold text-gray-800">8P Travel</span>
+        </div>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Danh sách đặt chỗ của bạn</h1>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+        <table class="w-full text-left table-auto border-collapse">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="px-4 py-2 text-gray-600 font-semibold rounded-tl-lg">Khách sạn</th>
+                    <th class="px-4 py-2 text-gray-600 font-semibold">Check-in</th>
+                    <th class="px-4 py-2 text-gray-600 font-semibold">Check-out</th>
+                    <th class="px-4 py-2 text-gray-600 font-semibold">Khách</th>
+                    <th class="px-4 py-2 text-gray-600 font-semibold">Trạng thái</th>
+                    <th class="px-4 py-2 text-gray-600 font-semibold rounded-tr-lg">Thời gian đặt</th>
+                </tr>
+            </thead>
+            <tbody id="booking-list"></tbody>
+        </table>
+        <div id="noBookingsMessage" class="text-center text-gray-500 py-8 hidden">
+            Bạn chưa có chỗ đặt nào.
+        </div>
+    </div>
+</main>
+
+<div id="messageBox" class="rounded-lg"></div>
+
+<script>
+const messageBox = document.getElementById('messageBox');
+
+function showMessage(message, type) {
+    messageBox.textContent = message;
+    messageBox.className = `rounded-lg visible ${type}`;
+    setTimeout(() => { messageBox.className = `rounded-lg ${type}`; }, 3000);
+}
+
+function renderBookings() {
+    const bookingsTable = document.getElementById("booking-list");
+    const noBookingsMessage = document.getElementById("noBookingsMessage");
+    bookingsTable.innerHTML = '';
+
+    const bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    if(bookings.length === 0){
+        noBookingsMessage.classList.remove("hidden");
+    } else {
+        noBookingsMessage.classList.add("hidden");
+        bookings.forEach(b => {
+            const row = document.createElement("tr");
+            row.classList.add("border-t", "border-gray-200", "hover:bg-gray-50");
+            row.innerHTML = `
+                <td class="px-4 py-3">${b.hotel}</td>
+                <td class="px-4 py-3">${b.checkin}</td>
+                <td class="px-4 py-3">${b.checkout}</td>
+                <td class="px-4 py-3">${b.guests}</td>
+                <td class="px-4 py-3">${b.status}</td>
+                <td class="px-4 py-3">${b.createdAt || ''}</td>
+            `;
+            bookingsTable.appendChild(row);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderBookings();
+
+    // Lắng nghe storage event để đồng bộ realtime
+    window.addEventListener('storage', (event) => {
+        if(event.key === 'bookings'){
+            renderBookings();
+            showMessage('Trạng thái đơn đã được cập nhật', 'success');
+        }
+    });
+});
+</script>
+</body>
+</html>
