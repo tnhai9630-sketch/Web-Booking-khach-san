@@ -110,7 +110,7 @@
     // Tạo thông tin đặt phòng
     const booking = {
       code: generateBookingCode(),
-      hotel: localStorage.getItem("hotelName") || hotel || "Chưa rõ khách sạn",
+      hotel: hotel,
       checkin: checkin,
       checkout: checkout,
       guests: guests,
@@ -130,7 +130,7 @@
     } else {
       alert("Thanh toán thành công!");
       // Xóa dữ liệu tạm thời
-      localStorage.setItem("hotelName", selectedHotel);
+      localStorage.removeItem("hotelName");
       localStorage.removeItem("selectedHotel");
       localStorage.removeItem("checkin");
       localStorage.removeItem("checkout");
@@ -146,3 +146,4 @@
 
 </body>
 </html>
+
