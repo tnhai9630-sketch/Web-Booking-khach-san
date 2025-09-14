@@ -36,6 +36,7 @@
 <script>
   // Lấy dữ liệu từ localStorage (trùng với key bạn dùng ở trang thanh-toan)
   const hotel   = localStorage.getItem("hotelName")   || "--";
+  document.getElementById("hotel-name").textContent = hotel;
   const checkin = localStorage.getItem("checkin")     || "--/--/----";
   const checkout= localStorage.getItem("checkout")    || "--/--/----";
   const guests  = localStorage.getItem("guests")      || "--";
@@ -63,3 +64,4 @@
 
 </body>
 </html>
+
