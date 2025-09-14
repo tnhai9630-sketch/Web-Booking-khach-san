@@ -223,7 +223,7 @@ if (hotelNameFromList) {
         alert('Ngày trả phòng phải sau ngày nhận phòng.');
         return;
       }
-      localStorage.setItem("selectedHotel", hotelNameEl.textContent);
+      localStorage.setItem("hotelName", hotelNameEl.textContent);
       localStorage.setItem("checkin", checkin);
       localStorage.setItem("checkout", checkout);
       localStorage.setItem("guests", guests);
@@ -235,4 +235,5 @@ if (hotelNameFromList) {
   </script>
 </body>
 </html>
+
 
